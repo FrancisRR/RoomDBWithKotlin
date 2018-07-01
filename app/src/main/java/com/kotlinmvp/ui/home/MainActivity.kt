@@ -1,15 +1,16 @@
-package com.kotlinmvp.ui
+package com.kotlinmvp.ui.home
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import com.kotlinmvp.R
 import com.kotlinmvp.base.AppController
-import com.kotlinmvp.ui.roomdb.RoomDb
-import com.kotlinmvp.ui.roomdb.RoomEntityModel
+import com.kotlinmvp.ui.home.roomdb.RoomDb
+import com.kotlinmvp.ui.home.roomdb.RoomEntityModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.item.*
+import kotlinx.android.synthetic.main.item.view.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -18,13 +19,15 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
 
     private var roomDbInstance:RoomDb?=null
     private var parentView:View?=null
-
+    private var contactList: List<RoomEntityModel>? = ArrayList<RoomEntityModel>();
+    private var contactUploadPresenter: ContactUploadPresenter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         roomDbInstance=AppController.getInstance().getRoomDbInstance();
+        contactUploadPresenter = ContactUploadPresenter(this)
         btInsert.setOnClickListener(this)
-
+        getAllDbData()
     }
 
 
@@ -46,41 +49,43 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
 
 
     private fun insertTODb(name:String?,phone:String){
-//        val model=RoomEntityModel(phone,name)
         val model=RoomEntityModel()
         model.userName=name;
         model.phone=phone;
-        lin_container.removeAllViews()
         async(CommonPool){
             roomDbInstance?.getRoomDao()?.insertDataToDb(model)
-        }
-        launch {
-           var contactList=roomDbInstance?.getRoomDao()?.getAllData();
+            contactList = roomDbInstance?.getRoomDao()?.getAllData();
             notifyData(contactList)
         }
     }
 
+    private fun getAllDbData() {
+        launch {
+            contactList = roomDbInstance!!.getRoomDao()!!.getAllData();
+            notifyData(contactList)
+        }
+
+    }
+
 
     private fun notifyData(contactList: List<RoomEntityModel>?){
-        if(contactList!=null && contactList.size>0){
-            /*for (aa in contactList){
-                var contactItem:RoomEntityModel=aa;
-                parentView=layoutInflater.inflate(R.layout.item,null);
-                tvName.text=contactItem.userName
-//                tvPhone.text=contactItem.phone
-//                lin_container.addView(parentView)
-            }*/
+        runOnUiThread {
+            if (contactList != null && contactList.size > 0) {
+                lin_container.removeAllViews()
+                for (aa in contactList) {
+                    var contactItem: RoomEntityModel = aa;
+                    parentView = LayoutInflater.from(this).inflate(R.layout.item, null);
+                    parentView!!.tvName.text = contactItem.userName
+                    parentView!!.tvPhone.text = contactItem.phone
+                    lin_container.addView(parentView)
+                }
 
+            }
         }
     }
 
 
-
-
-
-
-    private fun showToast(message:String?)
-    {
+    private fun showToast(message:String?) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
     }
 }

@@ -1,4 +1,4 @@
-package com.kotlinmvp.ui.roomdb
+package com.kotlinmvp.ui.home.roomdb
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity

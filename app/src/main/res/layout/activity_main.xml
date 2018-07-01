@@ -5,13 +5,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.home.MainActivity">
 
    <EditText
        android:id="@+id/edName"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:hint="Enter name"
+       android:text="Francis"
        android:maxLines="1"/>
 
     <EditText
@@ -19,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter phone"
+        android:text="1"
         android:layout_marginTop="15dp"
         android:maxLines="1"/>
     <LinearLayout

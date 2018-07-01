@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.kotlinmvp.app.MainThreadBus
-import com.kotlinmvp.ui.roomdb.RoomDb
+import com.kotlinmvp.ui.home.roomdb.RoomDb
 import com.squareup.otto.Bus
 
 open class AppController : Application() {
