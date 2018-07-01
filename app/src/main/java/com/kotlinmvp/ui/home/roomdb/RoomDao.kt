@@ -15,6 +15,9 @@ interface RoomDao {
     @Delete
     fun deleteDataToDb(modelObject: RoomEntityModel?)
 
+    @Query("DELETE FROM contact")
+    fun deleteAllToDb()
+
     @Query("SELECT * FROM contact")
     fun getAllData():List<RoomEntityModel>
 

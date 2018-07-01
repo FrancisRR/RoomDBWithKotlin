@@ -24,10 +24,30 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        roomDbInstance=AppController.getInstance().getRoomDbInstance();
+
+        setUi()
+        btDeleteAll.setOnClickListener {
+            deleteAllFromDb()
+        }
+    }
+
+
+    private fun setUi() {
+        setInstance()
+        setDisplayData()
+    }
+
+
+    private fun setDisplayData() {
+        getAllDbData()
+    }
+
+    private fun setInstance() {
+        roomDbInstance = AppController.getInstance().getRoomDbInstance();
         contactUploadPresenter = ContactUploadPresenter(this)
         btInsert.setOnClickListener(this)
-        getAllDbData()
+        btUpdate.setOnClickListener(this)
+        btDelete.setOnClickListener(this)
     }
 
 
@@ -42,22 +62,33 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
             showToast("Enter phone")
             return
         }
-        when (view!!.id){
-              R.id.btInsert->insertTODb(name,phone)
+
+        val model = RoomEntityModel()
+        model.userName = name;
+        model.phone = phone;
+
+        when (view!!.id) {
+            R.id.btInsert -> insertTODb(model)
+            R.id.btUpdate -> insertTODb(model)
+            R.id.btDelete -> deleteParticularDataFromDb(model)
         }
     }
 
 
-    private fun insertTODb(name:String?,phone:String){
-        val model=RoomEntityModel()
-        model.userName=name;
-        model.phone=phone;
+    private fun insertTODb(model: RoomEntityModel) {
         async(CommonPool){
             roomDbInstance?.getRoomDao()?.insertDataToDb(model)
-            contactList = roomDbInstance?.getRoomDao()?.getAllData();
-            notifyData(contactList)
+            getAllDbData()
         }
     }
+
+    private fun updateFromDb(model: RoomEntityModel) {
+        async(CommonPool) {
+            roomDbInstance?.getRoomDao()?.updateDataToDb(model)
+            getAllDbData()
+        }
+    }
+
 
     private fun getAllDbData() {
         launch {
@@ -65,6 +96,21 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
             notifyData(contactList)
         }
 
+    }
+
+
+    private fun deleteAllFromDb() {
+        async {
+            roomDbInstance?.getRoomDao()?.deleteAllToDb();
+            getAllDbData()
+        }
+    }
+
+    private fun deleteParticularDataFromDb(model: RoomEntityModel) {
+        async {
+            roomDbInstance?.getRoomDao()?.deleteDataToDb(model);
+            getAllDbData()
+        }
     }
 
 
@@ -80,12 +126,14 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener {
                     lin_container.addView(parentView)
                 }
 
+            }else{
+                lin_container.removeAllViews()
             }
         }
     }
 
 
-    private fun showToast(message:String?) {
+    private fun showToast(message: String?) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
     }
 }
